@@ -1,0 +1,23 @@
+name: Package
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check CMake package
+        run: |
+          cmake -S . -B build
+          cmake --build build
+          cmake --install build --prefix "${{ runner.temp }}/install"

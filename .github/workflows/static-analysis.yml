@@ -1,0 +1,57 @@
+name: Static Analysis
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  clang-tidy:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install clang-tidy
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends clang-tidy-14
+
+      - name: Validate clang-tidy configuration
+        run: |
+          clang-tidy-14 \
+            --config-file=.clang-tidy \
+            --dump-config >/dev/null
+
+      - name: Check C++ diagnostics
+        shell: bash
+        run: |
+          while IFS= read -r -d '' file; do
+            case "$file" in
+              *.h | *.hh | *.hpp | *.hxx)
+                language=c++-header
+                ;;
+              *)
+                language=c++
+                ;;
+            esac
+
+            clang-tidy-14 \
+              --config-file=.clang-tidy \
+              "$file" \
+              -- \
+              -x "$language" \
+              -std=c++17 \
+              -Iinclude \
+              -Wall \
+              -Wextra \
+              -Wpedantic
+          done < <(
+            git ls-files -z -- \
+              '*.cc' '*.cpp' '*.cxx' \
+              '*.h' '*.hh' '*.hpp' '*.hxx'
+          )
