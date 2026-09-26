@@ -1,0 +1,16 @@
+---
+Checks: >
+  -*,
+  clang-diagnostic-*,
+  clang-analyzer-*,
+  bugprone-unused-return-value,
+  bugprone-use-after-move,
+  modernize-use-override,
+  performance-for-range-copy,
+  performance-move-const-arg,
+  performance-unnecessary-copy-initialization,
+  performance-unnecessary-value-param
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*/include/robot_endpoints/.*'
+FormatStyle: file
+...
