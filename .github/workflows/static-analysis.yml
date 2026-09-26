@@ -16,6 +16,23 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Check transport boundary
+        shell: bash
+        run: |
+          forbidden_dependency_pattern='(^|[^[:alnum:]_])(rclcpp|rcl(_[[:alnum:]_]+)?|rmw(_[[:alnum:]_]+)?|ament(_[[:alnum:]_]+)?)([^[:alnum:]_]|$)'
+
+          if git grep -niE \
+            "$forbidden_dependency_pattern" \
+            -- \
+            CMakeLists.txt \
+            cmake \
+            include
+          then
+            echo \
+              "::error::robot_endpoints must not depend on rcl, rmw, or ament"
+            exit 1
+          fi
+
       - name: Install clang-tidy
         run: |
           sudo apt-get update
